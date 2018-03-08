@@ -1,9 +1,12 @@
-#!/bin/sh
+#!/bin/bash
+set -eu
 
 TEST_DIRECTORY="test"
 ERROR_MESSAGE="internal compiler error"
+CARGO_COMMAND="test"
 
-docker run --rm -v `pwd`:/dir -v `pwd`/$TEST_DIRECTORY:/source \
-	-e RUSTC=/dir/$RUSTC_RELATIVE -e CARGO_RELATIVE -e RUSTDOC=/dir/$RUSTDOC_RELATIVE \
-	bisector bash -c 'cd /source && rm -fr target ; /dir/$CARGO_RELATIVE test' \
-	2>&1 | rg -q "$ERROR_MESSAGE"
+cargo_absolute="$(readlink -e "${CARGO_RELATIVE}")"
+
+cd "${TEST_DIRECTORY}"
+rm -rf target
+"${cargo_absolute}" "${CARGO_COMMAND}" 2>&1 | grep -q "${ERROR_MESSAGE}"
