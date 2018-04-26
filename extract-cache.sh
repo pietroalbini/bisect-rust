@@ -5,8 +5,10 @@ if [[ "$#" -ne 1 ]]; then
     exit 1
 fi
 
+target="$(rustc -vV | grep host | awk '{print($2)}')"
+
 rm -rf "cache/$1"
 mkdir "cache/$1"
 for component in rustc cargo rust-std; do
-    tar xvf "cache/${1}-x86_64-unknown-linux-gnu-${component}.tar.xz" --strip-components=2 -C "cache/$1"
+    tar xvf "cache/${1}-${target}-${component}.tar.xz" --strip-components=2 -C "cache/$1"
 done
